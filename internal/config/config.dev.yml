@@ -1,0 +1,22 @@
+# config/config.dev.yaml
+
+app:
+  env: "dev"
+  port: "8080"
+
+db:
+  host: "localhost"
+  port: 5432
+  user: "user"
+  password: "password"
+  name: "userdb"
+  sslmode: "disable"
+
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 0
+
+jwt:
+  secret: "supersecretkey"
+  expireHours: 2

@@ -1,0 +1,56 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Output files
+*.out
+*.log
+
+# Build directories
+bin/
+build/
+
+# Dependency directories (vendor/ for modules)
+vendor/
+
+# Golang specific
+*.test
+coverage.out
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Go modules cache
+.gocache/
+
+# Swagger generated files (optional if regenerated)
+docs/swagger.json
+docs/swagger.yaml
+
+# Docker related
+postgres_data/
+
+# Secrets (never commit local environment files)
+.env
+.env.*
+config/*.local.yaml
+
+# Mockery and generated mocks (if you want to ignore generated mocks)
+**/mocks/*
+
+# Ignore compiled migrations if you generate them
+migrations/*.bin
+
+# Ignore Docker Compose override files
+/docker-compose.override.yml
+

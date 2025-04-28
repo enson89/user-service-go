@@ -1,0 +1,27 @@
+all: False
+template: testify
+packages:
+  "user-service/internal/auth":
+    config:
+      # generate mocks right next to your service package
+      dir: "internal/auth/mocks"
+      # optional: control the filenames, otherwise it defaults to mock_<interface>.go
+      filename: "mock_redis.go"
+      # optional: control the struct names
+      structname: "Mock{{.InterfaceName}}"
+    interfaces:
+      SessionStore:
+  "user-service/internal/service":
+    config:
+      dir: "internal/service/mocks"
+      filename: "mock_user_repository.go"
+      structname: "Mock{{.InterfaceName}}"
+    interfaces:
+      UserRepository:
+  "user-service/internal/transport/http":
+    config:
+      dir: "internal/transport/http/mocks"
+      filename: "mock_user_service.go"
+      structname: "Mock{{.InterfaceName}}"
+    interfaces:
+      UserService:
