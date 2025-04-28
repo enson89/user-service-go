@@ -20,42 +20,35 @@ A Go microservice handling user signup, authentication (JWT), role-based authori
 ### Prerequisites
 
 - Docker & Docker Compose
-- Go 1.21+
+- Go 1.24+
 - `make` utility
 
 ### Quickstart
 
-1. **Clone** the repository
-
-```bash
-git clone https://github.com/yourorg/cms-user-service.git
-cd cms-user-service
-```
-
-2. **Start local databases (Postgres and Redis)**
+1. **Start local databases (Postgres and Redis)**
 
 ```bash
 docker-compose up -d
 ```
 
-3. **Apply database migrations**
+2. **Apply database migrations**
 
 ```bash
 make migrate-up
 ```
 
-4. **Run the user service locally**
+3. **Run the user service locally**
 
 ```bash
-make run-dev
+make run
 ```
 
-5. **Access API**
+4. **Access API**
 
 - Health Check: `GET http://localhost:8080/health`
 - Swagger UI: `http://localhost:8080/swagger/index.html`
 
-6. **Run Lint and Tests**
+5. **Run Lint and Tests**
 
 ```bash
 make lint
@@ -73,7 +66,7 @@ docker-compose down
 ## 3. Tools and Technologies Used
 
 - **Language & Frameworks**:
-    - Go 1.21+, Gin (HTTP server)
+    - Go 1.24+, Gin (HTTP server)
     - sqlx (Postgres ORM), go-redis (Redis client)
     - Viper (configuration management)
     - testify, mockery (unit testing)
