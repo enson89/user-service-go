@@ -122,6 +122,8 @@ jobs:
           REPOSITORY: ${{ env.AWS_ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          CACHE_IMAGE="$REGISTRY/$REPOSITORY:cache"
+          
           docker buildx build \
             --push \
             --cache-from=type=registry,ref=$CACHE_IMAGE \
