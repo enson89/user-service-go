@@ -1,0 +1,37 @@
+# Version control
+.git
+.gitignore
+
+# GitHub Actions & CI/CD
+.github/
+docker-compose*.yml
+
+# Documentation & local configs
+README.md
+docs/
+k8s/
+Makefile
+*.env
+config.*.yml
+
+# Test artifacts and coverage
+**/*_test.go
+coverage.out
+
+# Generated mocks
+internal/**/mocks/
+
+# Database migrations (if you run them outside the container)
+migrations/
+
+# Editor / OS metadata
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local logs and binaries
+*.log
+user-service
