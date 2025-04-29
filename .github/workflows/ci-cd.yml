@@ -55,7 +55,9 @@ jobs:
           go-package: './...'
 
       - name: Run tests
-        run: go test ./... -coverprofile=coverage.out
+        run: |
+          TEST_PKGS=$(go list ./... | grep -v '/mocks')
+          go test $TEST_PKGS -coverprofile=coverage.out
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
