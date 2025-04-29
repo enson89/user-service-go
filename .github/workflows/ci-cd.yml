@@ -2,14 +2,15 @@ name: CI Pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  workflow_dispatch:
 
 env:
   GO_VERSION: '1.24'
   AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   AWS_ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY }}
+  CLUSTER_NAME: ${{ secrets.CLUSTER_NAME }}
 
 jobs:
   lint:
