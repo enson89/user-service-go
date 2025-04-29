@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/enson89/user-service-go/internal/cache"
 	"github.com/enson89/user-service-go/internal/config"
 	"github.com/enson89/user-service-go/internal/db"
@@ -8,7 +10,6 @@ import (
 	"github.com/enson89/user-service-go/internal/service"
 	"github.com/enson89/user-service-go/internal/transport/http"
 	"github.com/redis/go-redis/v9"
-	"log"
 
 	_ "github.com/enson89/user-service-go/docs"
 )
@@ -48,7 +49,7 @@ func main() {
 	// 5. Wire up HTTP transport and start server
 	router := http.NewRouter(svc, []byte(cfg.JWT.Secret), store)
 	log.Printf("starting server on :%s (env=%s)", cfg.App.Port, cfg.App.Env)
-	if err := router.Run(":" + cfg.App.Port); err != nil {
+	if err = router.Run(":" + cfg.App.Port); err != nil {
 		log.Fatalf("server error: %v", err)
 	}
 }

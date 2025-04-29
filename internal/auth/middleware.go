@@ -1,11 +1,13 @@
+//nolint:errcheck,mnd
 package auth
 
 import (
 	"context"
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type SessionStore interface {
@@ -13,8 +15,8 @@ type SessionStore interface {
 	IsBlacklisted(ctx context.Context, token string) (bool, error)
 }
 
-// AuthMiddleware parses and validates the JWT, then checks blacklist.
-func AuthMiddleware(secret []byte, store SessionStore) gin.HandlerFunc {
+// AuthenticationMiddleware parses and validates the JWT, then checks blacklist.
+func AuthenticationMiddleware(secret []byte, store SessionStore) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		header := c.GetHeader("Authorization")
 		parts := strings.SplitN(header, " ", 2)
@@ -23,7 +25,7 @@ func AuthMiddleware(secret []byte, store SessionStore) gin.HandlerFunc {
 			return
 		}
 		tokStr := parts[1]
-		tok, err := jwt.Parse(tokStr, func(t *jwt.Token) (interface{}, error) {
+		tok, err := jwt.Parse(tokStr, func(_ *jwt.Token) (interface{}, error) {
 			return secret, nil
 		})
 		if err != nil || !tok.Valid {

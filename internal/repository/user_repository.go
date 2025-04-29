@@ -1,9 +1,11 @@
+//nolint:nilnil
 package repository
 
 import (
 	"context"
 	"database/sql"
 	"errors"
+
 	"github.com/enson89/user-service-go/internal/model"
 	"github.com/jmoiron/sqlx"
 )
@@ -24,7 +26,9 @@ func (r *UserRepository) Create(ctx context.Context, u *model.User) error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer func() {
+		_ = tx.Rollback()
+	}()
 
 	const query = `
         INSERT INTO users (email, password_hash, role)
@@ -32,7 +36,7 @@ func (r *UserRepository) Create(ctx context.Context, u *model.User) error {
         RETURNING id
     `
 	// tx.GetContext will scan the returned id into u.ID
-	if err := tx.GetContext(ctx, &u.ID, query, u.Email, u.PasswordHash, u.Role); err != nil {
+	if err = tx.GetContext(ctx, &u.ID, query, u.Email, u.PasswordHash, u.Role); err != nil {
 		return err
 	}
 
@@ -96,7 +100,9 @@ func (r *UserRepository) Update(ctx context.Context, u *model.User) error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer func() {
+		_ = tx.Rollback()
+	}()
 
 	const q = `
       UPDATE users

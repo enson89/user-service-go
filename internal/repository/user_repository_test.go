@@ -2,7 +2,6 @@
 package repository_test
 
 import (
-	"context"
 	"database/sql"
 	"regexp"
 	"testing"
@@ -31,7 +30,7 @@ func TestCreate_UserRepository(t *testing.T) {
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(42))
 	mock.ExpectCommit()
 
-	err = repo.Create(context.Background(), u)
+	err = repo.Create(t.Context(), u)
 	assert.NoError(t, err)
 	assert.Equal(t, int64(42), u.ID)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -48,7 +47,7 @@ func TestGetByEmail_NotFound(t *testing.T) {
 		WithArgs("no@one.com").
 		WillReturnError(sql.ErrNoRows)
 
-	u, err := repo.GetByEmail(context.Background(), "no@one.com")
+	u, err := repo.GetByEmail(t.Context(), "no@one.com")
 	assert.NoError(t, err)
 	assert.Nil(t, u)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -67,7 +66,7 @@ func TestGetByEmail_Found(t *testing.T) {
 		WithArgs("x@y.com").
 		WillReturnRows(rows)
 
-	u, err := repo.GetByEmail(context.Background(), "x@y.com")
+	u, err := repo.GetByEmail(t.Context(), "x@y.com")
 	assert.NoError(t, err)
 	assert.Equal(t, int64(7), u.ID)
 	assert.Equal(t, "admin", u.Role)
@@ -87,7 +86,7 @@ func TestGetByID(t *testing.T) {
 		WithArgs(int64(3)).
 		WillReturnRows(rows)
 
-	u, err := repo.GetByID(context.Background(), 3)
+	u, err := repo.GetByID(t.Context(), 3)
 	assert.NoError(t, err)
 	assert.Equal(t, "u@v.com", u.Email)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -104,7 +103,7 @@ func TestDelete_Success(t *testing.T) {
 		WithArgs(int64(5)).
 		WillReturnResult(sqlmock.NewResult(0, 1))
 
-	err := repo.Delete(context.Background(), 5)
+	err := repo.Delete(t.Context(), 5)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
@@ -120,7 +119,7 @@ func TestDelete_NotFound(t *testing.T) {
 		WithArgs(int64(6)).
 		WillReturnResult(sqlmock.NewResult(0, 0))
 
-	err := repo.Delete(context.Background(), 6)
+	err := repo.Delete(t.Context(), 6)
 	assert.EqualError(t, err, "no user found to delete")
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
@@ -141,7 +140,7 @@ func TestUpdate_Success(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectCommit()
 
-	err = repo.Update(context.Background(), u)
+	err = repo.Update(t.Context(), u)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
@@ -162,7 +161,7 @@ func TestUpdate_NotFound(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(0, 0))
 	mock.ExpectRollback()
 
-	err = repo.Update(context.Background(), u)
+	err = repo.Update(t.Context(), u)
 	assert.Equal(t, sql.ErrNoRows, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }

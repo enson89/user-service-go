@@ -21,7 +21,7 @@ func NewRouter(svc UserService, jwtSecret []byte, sessionStore auth.SessionStore
 
 	// Protected
 	authGroup := r.Group("/")
-	authGroup.Use(auth.AuthMiddleware(jwtSecret, sessionStore))
+	authGroup.Use(auth.AuthenticationMiddleware(jwtSecret, sessionStore))
 	{
 		authGroup.GET("/profile", h.Profile)
 		authGroup.PUT("/profile", h.UpdateProfile)

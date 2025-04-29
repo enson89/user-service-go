@@ -2,10 +2,11 @@ package http
 
 import (
 	"context"
-	"github.com/enson89/user-service-go/internal/model"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/enson89/user-service-go/internal/model"
+	"github.com/gin-gonic/gin"
 )
 
 type UserService interface {
@@ -97,6 +98,8 @@ func (h *Handler) Login(c *gin.Context) {
 // @Failure      401      {object}  map[string]string
 // @Router       /profile [get]
 // @Security     ApiKeyAuth
+//
+//nolint:errcheck
 func (h *Handler) Profile(c *gin.Context) {
 	idVal, exists := c.Get("userID")
 	if !exists {
@@ -136,7 +139,7 @@ func (h *Handler) DeleteUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user ID"})
 		return
 	}
-	if err := h.svc.DeleteUser(getContext(c), id); err != nil {
+	if err = h.svc.DeleteUser(getContext(c), id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

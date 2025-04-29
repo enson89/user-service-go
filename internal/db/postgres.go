@@ -1,9 +1,11 @@
+//nolint:mnd
 package db
 
 import (
 	"fmt"
+
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" // this is required
 )
 
 // Config for PostgreSQL connection

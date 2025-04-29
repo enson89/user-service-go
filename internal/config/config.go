@@ -1,10 +1,12 @@
+//nolint:mnd
 package config
 
 import (
 	"errors"
 	"fmt"
-	"github.com/spf13/viper"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
 type AppConfig struct {
@@ -39,6 +41,7 @@ type Config struct {
 	JWT   JWTConfig   `mapstructure:"jwt"`
 }
 
+// nolint:nestif
 // Load reads configuration from file and environment variables.
 func Load() (*Config, error) {
 	// Allow overriding any field via env vars

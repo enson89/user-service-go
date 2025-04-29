@@ -1,12 +1,14 @@
 package auth_test
 
 import (
+	"testing"
+	"time"
+
 	"github.com/enson89/user-service-go/internal/auth"
 	"github.com/enson89/user-service-go/internal/model"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
-	"testing"
-	"time"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGenerateToken(t *testing.T) {
@@ -16,7 +18,7 @@ func TestGenerateToken(t *testing.T) {
 
 	// Generate token
 	tokStr, err := auth.GenerateToken(u, secret, expire)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotEmpty(t, tokStr)
 
 	// Parse token
@@ -27,7 +29,7 @@ func TestGenerateToken(t *testing.T) {
 		}
 		return secret, nil
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.True(t, token.Valid)
 
 	// Extract claims

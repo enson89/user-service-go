@@ -2,10 +2,10 @@
 package cache_test
 
 import (
-	"context"
-	"github.com/go-redis/redismock/v9"
 	"testing"
 	"time"
+
+	"github.com/go-redis/redismock/v9"
 
 	"github.com/stretchr/testify/assert"
 
@@ -18,17 +18,17 @@ func TestRedisSessionStore(t *testing.T) {
 
 	// BlacklistToken
 	mock.ExpectSet("tok", "1", time.Minute).SetVal("OK")
-	assert.NoError(t, store.BlacklistToken(context.Background(), "tok"))
+	assert.NoError(t, store.BlacklistToken(t.Context(), "tok"))
 
 	// IsBlacklisted true
 	mock.ExpectExists("tok").SetVal(1)
-	ok, err := store.IsBlacklisted(context.Background(), "tok")
+	ok, err := store.IsBlacklisted(t.Context(), "tok")
 	assert.NoError(t, err)
 	assert.True(t, ok)
 
 	// IsBlacklisted false
 	mock.ExpectExists("other").SetVal(0)
-	ok, err = store.IsBlacklisted(context.Background(), "other")
+	ok, err = store.IsBlacklisted(t.Context(), "other")
 	assert.NoError(t, err)
 	assert.False(t, ok)
 

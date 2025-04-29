@@ -3,11 +3,11 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
+	"time"
+
 	"github.com/enson89/user-service-go/internal/auth"
 	"github.com/enson89/user-service-go/internal/model"
 	"golang.org/x/crypto/bcrypt"
-	"time"
 )
 
 type UserRepository interface {
@@ -43,7 +43,7 @@ func (s *UserService) SignUp(ctx context.Context, email, password string) (*mode
 		return nil, err
 	}
 	u := &model.User{Email: email, PasswordHash: string(hash), Role: "user"}
-	if err := s.repo.Create(ctx, u); err != nil {
+	if err = s.repo.Create(ctx, u); err != nil {
 		return nil, err
 	}
 	return u, nil
@@ -54,7 +54,7 @@ func (s *UserService) Login(ctx context.Context, email, password string) (string
 	if err != nil || u == nil {
 		return "", errors.New("invalid credentials")
 	}
-	if err := bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(password)); err != nil {
+	if err = bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(password)); err != nil {
 		return "", errors.New("invalid credentials")
 	}
 	token, err := auth.GenerateToken(u, s.Secret, s.jwtExpire)
@@ -75,10 +75,10 @@ func (s *UserService) DeleteUser(ctx context.Context, id int64) error {
 func (s *UserService) UpdateUser(ctx context.Context, id int64, newName string) (*model.User, error) {
 	u, err := s.repo.GetByID(ctx, id)
 	if err != nil || u == nil {
-		return nil, fmt.Errorf("user not found")
+		return nil, errors.New("user not found")
 	}
 	u.Name = newName
-	if err := s.repo.Update(ctx, u); err != nil {
+	if err = s.repo.Update(ctx, u); err != nil {
 		return nil, err
 	}
 	return u, nil

@@ -19,9 +19,9 @@ func TestAuthMiddleware_NoHeader(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-	c.Request = httptest.NewRequest("GET", "/", nil)
+	c.Request = httptest.NewRequest(http.MethodGet, "/", nil)
 
-	m := auth.AuthMiddleware([]byte("secret"), nil)
+	m := auth.AuthenticationMiddleware([]byte("secret"), nil)
 	m(c)
 
 	assert.True(t, c.IsAborted())
@@ -32,10 +32,10 @@ func TestAuthMiddleware_InvalidToken(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-	c.Request = httptest.NewRequest("GET", "/", nil)
+	c.Request = httptest.NewRequest(http.MethodGet, "/", nil)
 	c.Request.Header.Set("Authorization", "Bearer invalid.token")
 
-	m := auth.AuthMiddleware([]byte("secret"), nil)
+	m := auth.AuthenticationMiddleware([]byte("secret"), nil)
 	m(c)
 
 	assert.True(t, c.IsAborted())
@@ -51,14 +51,14 @@ func TestAuthMiddleware_Blacklisted(t *testing.T) {
 	u := &model.User{ID: 5, Role: "user"}
 	secret := []byte("s3cr3t")
 	tok, _ := auth.GenerateToken(u, secret, time.Minute)
-	c.Request = httptest.NewRequest("GET", "/", nil)
+	c.Request = httptest.NewRequest(http.MethodGet, "/", nil)
 	c.Request.Header.Set("Authorization", "Bearer "+tok)
 
 	// Mock the store to return blacklisted
 	store := new(authmocks.MockSessionStore)
 	store.On("IsBlacklisted", mock.Anything, tok).Return(true, nil)
 
-	m := auth.AuthMiddleware(secret, store)
+	m := auth.AuthenticationMiddleware(secret, store)
 	m(c)
 
 	assert.True(t, c.IsAborted())
@@ -75,14 +75,14 @@ func TestAuthMiddleware_Success(t *testing.T) {
 	u := &model.User{ID: 7, Role: "admin"}
 	secret := []byte("topsecret")
 	tok, _ := auth.GenerateToken(u, secret, time.Minute)
-	c.Request = httptest.NewRequest("GET", "/", nil)
+	c.Request = httptest.NewRequest(http.MethodGet, "/", nil)
 	c.Request.Header.Set("Authorization", "Bearer "+tok)
 
 	// Mock store returns not blacklisted
 	store := new(authmocks.MockSessionStore)
 	store.On("IsBlacklisted", mock.Anything, tok).Return(false, nil)
 
-	m := auth.AuthMiddleware(secret, store)
+	m := auth.AuthenticationMiddleware(secret, store)
 	m(c)
 
 	assert.False(t, c.IsAborted())
