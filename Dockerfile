@@ -16,7 +16,7 @@ COPY . .
 # Build a static binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     go build -a -installsuffix cgo -ldflags="-s -w"  \
-    -o user-service cmd/server/main.go
+    -o user-service cmd/api/main.go
 
 # Final Stage
 FROM scratch
