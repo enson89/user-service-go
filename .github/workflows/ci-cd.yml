@@ -10,6 +10,7 @@ env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   AWS_ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY }}
+  CACHE_IMAGE: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.AWS_ECR_REPOSITORY }}:cache
 
 jobs:
   lint:
@@ -123,6 +124,6 @@ jobs:
         run: |
           docker buildx build \
             --push \
-            --tag $REGISTRY/$REPOSITORY:latest \
-            --tag $REGISTRY/$REPOSITORY:$IMAGE_TAG \
-            .
+            --cache-from=type=registry,ref=$CACHE_IMAGE \
+            --cache-to=type=registry,ref=$CACHE_IMAGE,mode=max \
+            -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
