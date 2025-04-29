@@ -10,7 +10,6 @@ env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   AWS_ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY }}
-  CACHE_IMAGE: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.AWS_ECR_REPOSITORY }}:cache
 
 jobs:
   lint:
@@ -95,37 +94,26 @@ jobs:
           path: coverage.out
 
   build-and-push:
-    name: Build & Push Docker image
+    name: Build & Push Docker Image
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v2
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build, tag & push
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: ${{ env.AWS_ECR_REPOSITORY }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          CACHE_IMAGE="$REGISTRY/$REPOSITORY:cache"
-          
-          docker buildx build \
-            --push \
-            --cache-from=type=registry,ref=$CACHE_IMAGE \
-            --cache-to=type=registry,ref=$CACHE_IMAGE,mode=max \
-            -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+      - name: Build, cache & push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
