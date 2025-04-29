@@ -47,7 +47,7 @@ jobs:
         uses: golangci/golangci-lint-action@v4
         with:
           version: v2.1.3
-          args: run --timeout 5m
+          args: --timeout 5m
 
       - name: Vulnerability scan (govulncheck)
         uses: golang/govulncheck-action@v1
