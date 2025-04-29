@@ -8,7 +8,6 @@ docker-compose*.yml
 
 # Documentation & local configs
 README.md
-docs/
 k8s/
 Makefile
 *.env
