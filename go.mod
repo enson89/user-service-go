@@ -1,4 +1,4 @@
-module user-service
+module github.com/enson89/user-service-go
 
 go 1.24.2
 

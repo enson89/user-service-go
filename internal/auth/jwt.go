@@ -1,9 +1,9 @@
 package auth
 
 import (
+	"github.com/enson89/user-service-go/internal/model"
 	"github.com/golang-jwt/jwt/v5"
 	"time"
-	"user-service/internal/model"
 )
 
 // GenerateToken creates a signed JWT for the user.

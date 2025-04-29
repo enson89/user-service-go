@@ -1,10 +1,10 @@
 package http
 
 import (
+	"github.com/enson89/user-service-go/internal/auth"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"user-service/internal/auth"
 )
 
 // NewRouter sets up routes and middleware

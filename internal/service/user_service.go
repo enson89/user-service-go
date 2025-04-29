@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/enson89/user-service-go/internal/auth"
+	"github.com/enson89/user-service-go/internal/model"
 	"golang.org/x/crypto/bcrypt"
 	"time"
-	"user-service/internal/auth"
-	"user-service/internal/model"
 )
 
 type UserRepository interface {

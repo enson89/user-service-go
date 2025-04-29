@@ -1,12 +1,12 @@
 package auth_test
 
 import (
+	"github.com/enson89/user-service-go/internal/auth"
+	"github.com/enson89/user-service-go/internal/model"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
-	"user-service/internal/auth"
-	"user-service/internal/model"
 )
 
 func TestGenerateToken(t *testing.T) {

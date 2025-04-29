@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/enson89/user-service-go/internal/model"
 	"github.com/jmoiron/sqlx"
-	"user-service/internal/model"
 )
 
 // UserRepository wraps a sqlx.DB to manage users.

@@ -12,9 +12,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"user-service/internal/model"
-	httptransport "user-service/internal/transport/http"
-	httphandlermocks "user-service/internal/transport/http/mocks"
+	"github.com/enson89/user-service-go/internal/model"
+	httptransport "github.com/enson89/user-service-go/internal/transport/http"
+	httphandlermocks "github.com/enson89/user-service-go/internal/transport/http/mocks"
 )
 
 func setupRouter(mockSvc *httphandlermocks.MockUserService) *gin.Engine {

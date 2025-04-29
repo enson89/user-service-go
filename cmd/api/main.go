@@ -1,16 +1,16 @@
 package main
 
 import (
+	"github.com/enson89/user-service-go/internal/cache"
+	"github.com/enson89/user-service-go/internal/config"
+	"github.com/enson89/user-service-go/internal/db"
+	"github.com/enson89/user-service-go/internal/repository"
+	"github.com/enson89/user-service-go/internal/service"
+	"github.com/enson89/user-service-go/internal/transport/http"
 	"github.com/redis/go-redis/v9"
 	"log"
-	"user-service/internal/cache"
-	"user-service/internal/config"
-	"user-service/internal/db"
-	"user-service/internal/repository"
-	"user-service/internal/service"
-	"user-service/internal/transport/http"
 
-	_ "user-service/docs"
+	_ "github.com/enson89/user-service-go/docs"
 )
 
 func main() {

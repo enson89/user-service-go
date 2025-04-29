@@ -2,10 +2,10 @@ package http
 
 import (
 	"context"
+	"github.com/enson89/user-service-go/internal/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
-	"user-service/internal/model"
 )
 
 type UserService interface {

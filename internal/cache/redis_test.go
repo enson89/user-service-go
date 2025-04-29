@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"user-service/internal/cache"
+	"github.com/enson89/user-service-go/internal/cache"
 )
 
 func TestRedisSessionStore(t *testing.T) {

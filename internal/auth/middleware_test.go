@@ -10,9 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"user-service/internal/auth"
-	authmocks "user-service/internal/auth/mocks"
-	"user-service/internal/model"
+	"github.com/enson89/user-service-go/internal/auth"
+	authmocks "github.com/enson89/user-service-go/internal/auth/mocks"
+	"github.com/enson89/user-service-go/internal/model"
 )
 
 func TestAuthMiddleware_NoHeader(t *testing.T) {

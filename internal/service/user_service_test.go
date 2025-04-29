@@ -12,10 +12,10 @@ import (
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/crypto/bcrypt"
 
-	authMocks "user-service/internal/auth/mocks"
-	"user-service/internal/model"
-	"user-service/internal/service"
-	repoMocks "user-service/internal/service/mocks"
+	authMocks "github.com/enson89/user-service-go/internal/auth/mocks"
+	"github.com/enson89/user-service-go/internal/model"
+	"github.com/enson89/user-service-go/internal/service"
+	repoMocks "github.com/enson89/user-service-go/internal/service/mocks"
 )
 
 func TestSignUp_Success(t *testing.T) {

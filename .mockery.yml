@@ -1,7 +1,7 @@
 all: False
 template: testify
 packages:
-  "user-service/internal/auth":
+  "github.com/enson89/user-service-go/internal/auth":
     config:
       # generate mocks right next to your service package
       dir: "internal/auth/mocks"
@@ -11,14 +11,14 @@ packages:
       structname: "Mock{{.InterfaceName}}"
     interfaces:
       SessionStore:
-  "user-service/internal/service":
+  "github.com/enson89/user-service-go/internal/service":
     config:
       dir: "internal/service/mocks"
       filename: "mock_user_repository.go"
       structname: "Mock{{.InterfaceName}}"
     interfaces:
       UserRepository:
-  "user-service/internal/transport/http":
+  "github.com/enson89/user-service-go/internal/transport/http":
     config:
       dir: "internal/transport/http/mocks"
       filename: "mock_user_service.go"

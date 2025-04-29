@@ -11,8 +11,8 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
 
-	"user-service/internal/model"
-	"user-service/internal/repository"
+	"github.com/enson89/user-service-go/internal/model"
+	"github.com/enson89/user-service-go/internal/repository"
 )
 
 func TestCreate_UserRepository(t *testing.T) {
