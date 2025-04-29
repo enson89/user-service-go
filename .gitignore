@@ -33,10 +33,6 @@ Thumbs.db
 # Go modules cache
 .gocache/
 
-# Swagger generated files (optional if regenerated)
-docs/swagger.json
-docs/swagger.yaml
-
 # Docker related
 postgres_data/
 
