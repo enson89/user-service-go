@@ -1,15 +1,9 @@
-name: CI/CD Pipeline
+name: CI Pipeline
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
-    inputs:
-      image-tag:
-        description: 'ECR image tag to deploy'
-        required: true
-        default: 'latest'
 
 env:
   GO_VERSION: '1.24'
@@ -18,46 +12,82 @@ env:
   AWS_ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY }}
 
 jobs:
-  build-and-push:
-    name: Build, Lint, Test & Push
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: ${{ env.GO_VERSION }}
-          cache: true
 
-      - name: Cache Go build
+      - name: Cache Go modules
         uses: actions/cache@v3
         with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ env.GO_VERSION }}-${{ hashFiles('**/go.sum') }}
+          path: ~/go/pkg/mod
+          key: go-mod-${{ hashFiles('**/go.sum') }}
 
-      - name: Static analysis (go vet)
-        run: go vet ./...
-
-      - name: Lint code
-        uses: golangci/golangci-lint-action@v7
+      - name: Run linters
+        uses: golangci/golangci-lint-action@v4
         with:
-          version: v2.0
+          args: run --timeout 5m
 
-      - name: Vulnerability scan (govulncheck)
+  vuln:
+    name: Vulnerability scan
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: go-mod-${{ hashFiles('**/go.sum') }}
+
+      - name: govulncheck
         uses: golang/govulncheck-action@v1
         with:
           go-version-input: ${{ env.GO_VERSION }}
           go-package: './...'
 
-      - name: Run tests
+  test:
+    name: Test & Coverage
+    runs-on: ubuntu-latest
+    needs: [lint, vuln]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Cache Go build & test cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ runner.tool_cache }}/go-build
+            ${{ env.GOCACHE }}
+          key: go-build-test-${{ hashFiles('**/*.go') }}
+
+      - name: Static analysis
+        run: go vet ./...
+
+      - name: Run tests (exclude mocks)
         run: |
-          TEST_PKGS=$(go list ./... | grep -v '/mocks')
-          go test $TEST_PKGS -coverprofile=coverage.out
+          PKGS=$(go list ./... | grep -v '/mocks')
+          go test $PKGS -coverprofile=coverage.out
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
@@ -65,8 +95,19 @@ jobs:
           name: coverage-report
           path: coverage.out
 
+  build-and-push:
+    name: Build & Push Docker image
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -76,11 +117,14 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag & push Docker image
+      - name: Build, tag & push
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ${{ env.AWS_ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
-          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker buildx build \
+            --push \
+            --tag $REGISTRY/$REPOSITORY:latest \
+            --tag $REGISTRY/$REPOSITORY:$IMAGE_TAG \
+            .
