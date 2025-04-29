@@ -3,7 +3,7 @@ template: testify
 packages:
   "github.com/enson89/user-service-go/internal/auth":
     config:
-      # generate mocks right next to your service package
+      # generate mocks right next to service package
       dir: "internal/auth/mocks"
       # optional: control the filenames, otherwise it defaults to mock_<interface>.go
       filename: "mock_redis.go"

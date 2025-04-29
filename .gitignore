@@ -45,9 +45,6 @@ postgres_data/
 .env.*
 config/*.local.yaml
 
-# Mockery and generated mocks (if you want to ignore generated mocks)
-**/mocks/*
-
 # Ignore compiled migrations if you generate them
 migrations/*.bin
 
