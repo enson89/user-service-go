@@ -15,11 +15,11 @@ env:
   GO_VERSION: '1.24'
   AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-  ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY }}
+  AWS_ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY }}
 
 jobs:
   build-and-push:
-    name: Build, Test & Push
+    name: Build, Lint, Test & Push
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     steps:
@@ -33,57 +33,53 @@ jobs:
           cache: true
 
       - name: Cache Go build
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
-          path: ~/.cache/go-build
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ env.GO_VERSION }}-${{ hashFiles('**/go.sum') }}
 
-      - name: Install linters & scanners
-        run: |
-          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-          go install golang.org/x/vuln/cmd/govulncheck@latest
-
-      - name: Static code analysis
+      - name: Static analysis (go vet)
         run: go vet ./...
 
       - name: Lint code
-        run: golangci-lint run ./...
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: v2.19.1
+          args: run --timeout 5m
 
-      - name: Vulnerability scan
-        run: govulncheck ./...
+      - name: Vulnerability scan (govulncheck)
+        uses: golang/govulncheck-action@v1
+        with:
+          go-version-input: ${{ env.GO_VERSION }}
+          go-package: './...'
 
       - name: Run tests
         run: go test ./... -coverprofile=coverage.out
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Login to ECR
-        run: |
-          aws ecr get-login-password --region $AWS_REGION \
-            | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-
-      - name: Build Docker image
-        run: docker build -t $ECR_REPOSITORY .
-
-      - name: Tag Docker image
-        run: |
-          docker tag $ECR_REPOSITORY:latest \
-            $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
-          docker tag $ECR_REPOSITORY:latest \
-            $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:${{ github.sha }}
-
-      - name: Push images
-        run: |
-          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
-          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:${{ github.sha }}
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage.out
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag & push Docker image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ env.AWS_ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
