@@ -25,7 +25,7 @@ func setupRouter(mockSvc *httphandlermocks.MockUserService) *gin.Engine {
 func TestHandler_HealthCheck(t *testing.T) {
 	router := setupRouter(nil)
 
-	req := httptest.NewRequest(http.MethodGet, "/health", nil)
+	req := httptest.NewRequest(http.MethodGet, "/v1/health", nil)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -50,7 +50,7 @@ func TestHandler_SignUp(t *testing.T) {
 		Return(&model.User{ID: 10, Email: "new@x.com", Role: "user"}, nil)
 
 	// perform request
-	req := httptest.NewRequest(http.MethodPost, "/signup", bytes.NewBuffer(buf))
+	req := httptest.NewRequest(http.MethodPost, "/v1/signup", bytes.NewBuffer(buf))
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -76,7 +76,7 @@ func TestHandler_Login(t *testing.T) {
 		On("Login", mock.Anything, "ok@x.com", "pw").
 		Return("token123", nil)
 
-	req := httptest.NewRequest(http.MethodPost, "/login", bytes.NewBuffer(buf))
+	req := httptest.NewRequest(http.MethodPost, "/v1/login", bytes.NewBuffer(buf))
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -140,7 +140,7 @@ func TestHandler_UpdateProfile(t *testing.T) {
 	buf, _ := json.Marshal(body)
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-	c.Request = httptest.NewRequest(http.MethodPut, "/profile", bytes.NewBuffer(buf))
+	c.Request = httptest.NewRequest(http.MethodPut, "/v1/profile", bytes.NewBuffer(buf))
 	c.Request.Header.Set("Content-Type", "application/json")
 	c.Set("userID", int64(1))
 

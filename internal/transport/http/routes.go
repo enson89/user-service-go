@@ -12,15 +12,16 @@ func NewRouter(svc UserService, jwtSecret []byte, sessionStore auth.SessionStore
 	h := NewHandler(svc)
 	r := gin.Default()
 
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	v1 := r.Group("/v1")
+	v1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Public
-	r.GET("/health", h.HealthCheck)
-	r.POST("/signup", h.SignUp)
-	r.POST("/login", h.Login)
+	v1.GET("/health", h.HealthCheck)
+	v1.POST("/signup", h.SignUp)
+	v1.POST("/login", h.Login)
 
 	// Protected
-	authGroup := r.Group("/")
+	authGroup := v1.Group("/")
 	authGroup.Use(auth.AuthenticationMiddleware(jwtSecret, sessionStore))
 	{
 		authGroup.GET("/profile", h.Profile)
