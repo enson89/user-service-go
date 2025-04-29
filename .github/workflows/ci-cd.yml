@@ -31,9 +31,7 @@ jobs:
           key: go-mod-${{ hashFiles('**/go.sum') }}
 
       - name: Run linters
-        uses: golangci/golangci-lint-action@v4
-        with:
-          args: run --timeout 5m
+        uses: golangci/golangci-lint-action@v7
 
   vuln:
     name: Vulnerability scan
