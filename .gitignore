@@ -47,3 +47,4 @@ migrations/*.bin
 # Ignore Docker Compose override files
 /docker-compose.override.yml
 
+*.pem

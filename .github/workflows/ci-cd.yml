@@ -155,8 +155,9 @@ jobs:
             --region $AWS_REGION \
             --name $CLUSTER_NAME
 
-      - name: Deploy to cluster
+      - name: Inject image and deploy manifest
         run: |
-          kubectl set image deployment/user-service-go \
-            user-service-go=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_ECR_REPOSITORY:${{ github.sha }}
-          kubectl rollout status deployment/user-service-go
+          IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_ECR_REPOSITORY:${{ github.sha }}
+          sed "s|<your-ecr-repo-uri>:<tag>|$IMAGE_URI|g" k8s/deployment.yaml | kubectl apply -f -
+          kubectl apply -f k8s/service.yaml
+          kubectl rollout status deployment/user-service -n user-service
