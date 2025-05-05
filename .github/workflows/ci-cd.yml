@@ -158,6 +158,6 @@ jobs:
       - name: Inject image and deploy manifest
         run: |
           IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_ECR_REPOSITORY:${{ github.sha }}
-          sed "s|<your-ecr-repo-uri>:<tag>|$IMAGE_URI|g" k8s/deployment.yaml | kubectl apply -f -
-          kubectl apply -f k8s/service.yaml
+          sed "s|<your-ecr-repo-uri>:<tag>|$IMAGE_URI|g" k8s/deployment.yml | kubectl apply -f -
+          kubectl apply -f k8s/service.yml
           kubectl rollout status deployment/user-service -n user-service
